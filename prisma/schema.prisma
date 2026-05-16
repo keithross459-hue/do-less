@@ -1,0 +1,247 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String?
+  passwordHash  String?
+  avatarUrl     String?
+  plan          String    @default("starter")
+  credits       Int       @default(1000)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  workspaces    WorkspaceMember[]
+  conversations Conversation[]
+}
+
+model Workspace {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  avatarUrl   String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members     WorkspaceMember[]
+  agents      Agent[]
+  workflows   Workflow[]
+  connectors  Connector[]
+}
+
+model Connector {
+  id          String   @id @default(uuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  platform    String   // "github" | "slack" | "shopify" | "desktop" | "stripe"
+  name        String   // e.g. "Main Slack Workspace"
+  status      String   @default("disconnected") // "connected" | "disconnected" | "error"
+  
+  authData    String?  // Encrypted tokens or API keys
+  settings    String   @default("{}")
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([workspaceId, platform])
+}
+
+
+model WorkspaceMember {
+  id          String    @id @default(uuid())
+  workspaceId String
+  userId      String
+  role        String    @default("member") // "owner" | "admin" | "member" | "viewer"
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime  @default(now())
+
+  @@unique([workspaceId, userId])
+}
+
+
+model Agent {
+  id          String   @id @default(uuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  // Identity
+  name        String
+  avatar      String?
+  archetype   String   @default("The Executive")
+  backstory   String?
+  brandColor  String   @default("#00f0ff")
+  occupation  String?
+
+  // Personality (stored as JSON blob of slider values 0-100)
+  personality String   @default("{}")
+
+  // Behavior
+  operatingMode     String  @default("Corporate")
+  decisionFramework String  @default("Data-Driven")
+  communicationStyle String @default("{}")
+
+  // AI Model Config
+  primaryModel   String  @default("gpt-4o")
+  fallbackModel  String? 
+  temperature    Float   @default(0.7)
+  maxTokens      Int     @default(2048)
+  systemPrompt   String?
+
+  // Stats
+  tasksCompleted Int     @default(0)
+  status         String  @default("idle")
+  downloads      Int     @default(0)
+  rating         Float   @default(5.0)
+
+  // Marketplace
+  isPublic             Boolean @default(false)
+  price                Float   @default(0)
+  marketplaceDescription String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conversations Conversation[]
+  memories      Memory[]
+  workflows     AgentWorkflow[]
+  tools         AgentTool[]
+}
+
+model Tool {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  icon        String   // Lucide icon name
+  category    String   // "Search", "Social", "Finance", "Dev", "Utility"
+  provider    String   // "Google", "Slack", "Stripe", "Internal"
+  
+  configJson  String   @default("{}") // Default configuration schema
+  isPremium   Boolean  @default(false)
+  price       Float    @default(0)
+
+  createdAt   DateTime @default(now())
+  agents      AgentTool[]
+}
+
+model AgentTool {
+  id        String   @id @default(uuid())
+  agentId   String
+  toolId    String
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  tool      Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+
+  config    String   @default("{}") // Agent-specific tool configuration
+
+  @@unique([agentId, toolId])
+}
+
+
+model Workflow {
+  id          String   @id @default(uuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  name        String
+  description String?
+  status      String   @default("draft")
+  version     String   @default("1.0.0")
+
+  // Stored as JSON
+  nodesJson   String   @default("[]")
+  edgesJson   String   @default("[]")
+
+  executions  Int      @default(0)
+  successRate Float    @default(0)
+  lastRunAt   DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  agents      AgentWorkflow[]
+}
+
+model AgentWorkflow {
+  id         String   @id @default(uuid())
+  agentId    String
+  workflowId String
+  agent      Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, workflowId])
+}
+
+model Conversation {
+  id        String   @id @default(uuid())
+  userId    String
+  agentId   String?  // Optional for group chats
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  agent     Agent?    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  title     String?
+  type      String   @default("private") // "private" | "group"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages  Message[]
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  agentId        String?      // Who sent it (if assistant)
+  role           String       // "user" | "assistant" | "system"
+  content        String
+  model          String?      // which AI model was used
+  tokens         Int?         // token count
+  latencyMs      Int?         // response time
+
+  createdAt      DateTime     @default(now())
+}
+
+model Memory {
+  id        String   @id @default(uuid())
+  agentId   String
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  layer     String   // "short-term" | "long-term" | "user" | "emotional" | "learning" | "team"
+  content   String
+  metadata  String?  // JSON metadata
+  confidence Float   @default(0.9)
+  source    String?  // where it was learned from
+  expiresAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  workspaceId String
+  agentId     String?
+  workflowId  String?
+  
+  action      String   // "ai_decision" | "workflow_run" | "agent_created" | "security_handshake"
+  entity      String   // e.g. "Agent", "Workflow", "System"
+  entityId    String?
+  
+  description String
+  metadata    String?  // JSON blob of decision parameters, model IDs, etc.
+  severity    String   @default("info") // "info" | "warn" | "error" | "critical"
+  
+  createdAt   DateTime @default(now())
+}
+
