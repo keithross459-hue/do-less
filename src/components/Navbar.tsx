@@ -1,6 +1,7 @@
 "use client";
 
 import { Bell, Search } from "lucide-react";
+import Link from "next/link";
 
 export function Navbar() {
   return (
@@ -21,9 +22,10 @@ export function Navbar() {
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full animate-pulse"></span>
         </button>
         <div className="h-6 w-px bg-white/10"></div>
-        <div className="flex items-center gap-2 text-sm">
-          <span className="text-zinc-400">Credits:</span>
-          <span className="text-primary font-mono font-bold">12,450</span>
+        <div className="flex items-center gap-3">
+          <Link href="/pricing" className="px-4 py-1.5 rounded-full bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/50 text-primary text-sm font-medium hover:bg-primary/30 transition-all neon-border shadow-[0_0_15px_rgba(var(--primary),0.3)] block">
+            Upgrade to Pro
+          </Link>
         </div>
       </div>
     </header>

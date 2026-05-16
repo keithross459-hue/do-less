@@ -125,7 +125,20 @@ ipcMain.handle('get-system-info', async () => {
   };
 });
 
+ipcMain.handle('capture-screen', async () => {
+  const { desktopCapturer } = require('electron');
+  const sources = await desktopCapturer.getSources({ types: ['screen'], thumbnailSize: { width: 1920, height: 1080 } });
+  // Return the first screen's thumbnail as dataURL
+  return sources[0].thumbnail.toDataURL();
+});
+
+ipcMain.on('robot-action', (event, { type, x, y, text }) => {
+  console.log(`Neural Bridge Action: ${type} at (${x}, ${y}) with text: ${text}`);
+  // In a real production app, we would use a library like 'robotjs' or 'nut.js' here
+  // to actually move the mouse and click. For this OS layer, we log the intent.
+});
+
 ipcMain.on('execute-command', (event, command) => {
   console.log('Executing Native Command:', command);
-  // Here we would trigger local scripts, terminal commands, etc.
 });
+

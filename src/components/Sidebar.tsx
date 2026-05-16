@@ -9,18 +9,24 @@ import {
   Store, 
   Settings, 
   Database,
-  PlusCircle
+  PlusCircle,
+  Terminal,
+  Share2
 } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "My Agents", href: "/agents", icon: Bot },
-  { name: "Workflows", href: "/workflows", icon: Network },
-  { name: "Memory base", href: "/memory", icon: Database },
-  { name: "Marketplace", href: "/marketplace", icon: Store },
+  { name: "Command Center", href: "/", icon: LayoutDashboard },
+  { name: "Agent Swarm", href: "/agents", icon: Bot },
+  { name: "Automations", href: "/workflows", icon: Network },
+  { name: "Memory Vault", href: "/memory", icon: Database },
+  { name: "The Nexus Core", href: "/tools", icon: Network }, // Connectivity hub
+  { name: "Neural REPL", href: "/repl", icon: Terminal },
+  { name: "Neural Web", href: "/visualizer", icon: Share2 },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
+
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -64,15 +70,27 @@ export function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-white/10">
-        <div className="flex items-center gap-3 px-3 py-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-secondary p-[1px]">
-            <div className="w-full h-full bg-background rounded-full border border-white/10 flex items-center justify-center text-xs font-bold">
+        <div className="mb-4 px-3">
+          <div className="flex justify-between text-xs mb-2">
+            <span className="text-zinc-400">Agents Limit</span>
+            <span className="text-primary">2 / 3</span>
+          </div>
+          <div className="w-full bg-white/5 rounded-full h-2">
+            <div className="bg-primary h-2 rounded-full" style={{ width: '66%' }}></div>
+          </div>
+          <Link href="/pricing" className="mt-3 w-full block text-center text-xs py-1.5 bg-white/5 hover:bg-white/10 rounded-md text-white transition-colors border border-white/10">
+            Upgrade Plan
+          </Link>
+        </div>
+        <div className="flex items-center gap-3 px-3 py-2 bg-white/5 rounded-lg border border-white/5">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-zinc-700 to-zinc-600 p-[1px]">
+            <div className="w-full h-full bg-background rounded-full border border-white/10 flex items-center justify-center text-xs font-bold text-zinc-300">
               U
             </div>
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-medium text-white">User</span>
-            <span className="text-xs text-zinc-500">Pro Plan</span>
+            <span className="text-xs text-zinc-500">Free Plan</span>
           </div>
         </div>
       </div>

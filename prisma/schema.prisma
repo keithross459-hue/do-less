@@ -35,7 +35,9 @@ model Workspace {
   agents      Agent[]
   workflows   Workflow[]
   connectors  Connector[]
+  screenMemories ScreenMemory[]
 }
+
 
 model Connector {
   id          String   @id @default(uuid())
@@ -244,4 +246,17 @@ model AuditLog {
   
   createdAt   DateTime @default(now())
 }
+
+model ScreenMemory {
+  id          String   @id @default(uuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  screenshotUrl String   // Local path or dataURL
+  description   String   // AI-generated summary of what was on screen
+  metadata      String?  // JSON blob (active app, window title, etc.)
+  
+  createdAt     DateTime @default(now())
+}
+
 

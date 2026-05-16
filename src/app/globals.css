@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #050505;
+  --color-background: #000000;
   --color-foreground: #fafafa;
   --color-primary: #00f0ff;
   --color-secondary: #7000ff;
@@ -14,15 +14,15 @@
 
 @layer base {
   :root {
-    --background: #050505;
+    --background: #000000;
     --foreground: #fafafa;
   }
   body {
     background-color: var(--background);
     color: var(--foreground);
     background-image: 
-      linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+      linear-gradient(to right, rgba(255,255,255,0.01) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.01) 1px, transparent 1px);
     background-size: 40px 40px;
     background-position: center center;
   }

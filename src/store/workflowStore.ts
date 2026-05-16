@@ -93,7 +93,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   executionLogs: [],
 
   onNodesChange: (changes) => {
-    set({ nodes: applyNodeChanges(changes, get().nodes) });
+    set({ nodes: applyNodeChanges(changes, get().nodes) as WorkflowNode[] });
   },
 
   onEdgesChange: (changes) => {

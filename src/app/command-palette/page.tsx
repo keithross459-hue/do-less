@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Zap, Bot, FileText, Globe, Github, Terminal, ArrowRight, History, Sparkles } from "lucide-react";
+import { Search, Zap, Bot, FileText, Globe, Terminal, ArrowRight, History, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -9,7 +9,7 @@ const suggestions = [
   { id: "s1", type: "cmd", text: "deploy latest build", icon: Zap, color: "#00f0ff" },
   { id: "s2", type: "cmd", text: "summarize Slack #general", icon: Bot, color: "#7000ff" },
   { id: "s3", type: "file", text: "Q3_Invoice_Draft.pdf", icon: FileText, color: "#9ca3af" },
-  { id: "s4", type: "repo", text: "nexus-core-engine", icon: Github, color: "#ffffff" },
+  { id: "s4", type: "repo", text: "nexus-core-engine", icon: Globe, color: "#ffffff" },
 ];
 
 export default function CommandPalette() {

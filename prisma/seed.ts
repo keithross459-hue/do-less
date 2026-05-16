@@ -151,6 +151,51 @@ async function main() {
     console.log(`✅ Workflow created: ${wf.name}`);
   }
 
+  // Create sample connectors
+  const connectors = [
+    { platform: "github", name: "AgentOS-Lab", status: "connected" },
+    { platform: "slack", name: "Nexus-Tech-HQ", status: "connected" },
+    { platform: "shopify", name: "FiiLTHY Store", status: "disconnected" },
+    { platform: "desktop", name: "Main Workstation", status: "connected" },
+    { platform: "stripe", name: "Production Gateway", status: "error" },
+  ];
+
+  for (const conn of connectors) {
+    await prisma.connector.create({
+      data: { workspaceId: workspace.id, ...conn },
+    });
+    console.log(`✅ Connector created: ${conn.name}`);
+  }
+
+  // Create sample Screen Memories
+  const screenMemories = [
+    { screenshotUrl: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1920", description: "Analyzing system terminal for anomalies.", metadata: JSON.stringify({ app: "Terminal", cpu: "12%" }) },
+    { screenshotUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=1920", description: "Mapping neural topography of the Nexus Core.", metadata: JSON.stringify({ app: "Neural Web", mode: "visualizer" }) },
+    { screenshotUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1920", description: "Security audit of GitHub PRs and Slack channels.", metadata: JSON.stringify({ app: "Nexus Shell", threat_level: "none" }) },
+  ];
+
+  for (const sm of screenMemories) {
+    await prisma.screenMemory.create({
+      data: { workspaceId: workspace.id, ...sm },
+    });
+    console.log(`✅ Screen Memory created: ${sm.description}`);
+  }
+
+  // Create sample Audit Logs
+  const auditLogs = [
+    { action: "security_handshake", entity: "System", description: "Neural Bridge successfully authenticated with Local Desktop.", severity: "info" },
+    { action: "ai_decision", entity: "Agent", description: "Nexus-7 decided to automate Shopify inventory sync based on Slack trends.", severity: "info" },
+    { action: "security_handshake", entity: "System", description: "External API key for Stripe reported expired. Connection throttled.", severity: "warn" },
+  ];
+
+  for (const log of auditLogs) {
+    await prisma.auditLog.create({
+      data: { workspaceId: workspace.id, ...log },
+    });
+    console.log(`✅ Audit Log created: ${log.action}`);
+  }
+
+
   console.log("\n🎉 Seed complete!");
 }
 

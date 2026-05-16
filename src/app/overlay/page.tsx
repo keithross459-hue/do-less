@@ -9,6 +9,7 @@ import { VoiceController } from "@/lib/desktop-automation";
 
 export default function DesktopOverlay() {
   const [isHologramActive, setIsHologramActive] = useState(false);
+  const [isThinking, setIsThinking] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [lastVoiceCmd, setLastVoiceCmd] = useState("");
   const [activeAgents, setActiveAgents] = useState([
@@ -49,18 +50,42 @@ export default function DesktopOverlay() {
     return () => window.removeEventListener("click", handleGlobalClick);
   }, [toggleHologram]);
 
-  // Simulate live telemetry
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTelemetry(prev => ({
-        cpu: Math.floor(Math.random() * 20) + 5,
-        mem: (4.2 + Math.random() * 0.1).toFixed(1) as any,
-        ops: prev.ops + Math.floor(Math.random() * 10),
-        tokens: (parseFloat(prev.tokens as any) + 0.1).toFixed(1) as any
-      }));
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
+  // Nexus Neural Bridge: See & Act
+  const handleSeeAndAct = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsThinking(true);
+    toggleHologram();
+
+    if (typeof window !== 'undefined' && (window as any).nexusNative) {
+      try {
+        const screenshot = await (window as any).nexusNative.captureScreen();
+        console.log("Neural Bridge: Screen captured for analysis.");
+        
+        // Save to Memory Vault
+        await fetch("/api/nexus/memory", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            screenshot, 
+            description: "Neural Bridge Snapshot: User Workspace Analysis",
+            metadata: { app: "Nexus OS", type: "perceptual_snapshot" }
+          })
+        });
+
+        setTimeout(() => {
+          setIsThinking(false);
+          setLastVoiceCmd("Analyzing UI elements... Memory indexed.");
+        }, 1500);
+
+      } catch (err) {
+        console.error("Neural Bridge Capture Failed:", err);
+        setIsThinking(false);
+      }
+    } else {
+      console.warn("Neural Bridge: Native environment not detected.");
+      setIsThinking(false);
+    }
+  };
 
   return (
     <div className={cn(
@@ -110,11 +135,19 @@ export default function DesktopOverlay() {
                <div className="px-1.5 py-0.5 rounded bg-primary/20 border border-primary/40 text-[8px] text-primary font-bold">MONITORING</div>
             </div>
             <p className="text-[10px] text-primary font-bold animate-pulse">
-              {isListening ? (lastVoiceCmd || "Listening...") : "Controller Connected // Tracking User Intent"}
+              {isThinking ? "NEURAL BRIDGE ACTIVE // ANALYZING..." : (isListening ? (lastVoiceCmd || "Listening...") : "Controller Connected // Tracking User Intent")}
             </p>
           </div>
 
           <div className="flex gap-1">
+            <button 
+              onClick={handleSeeAndAct}
+              className="p-1.5 rounded-md hover:bg-primary/20 text-primary transition-all group relative"
+              title="Neural Bridge: See & Act"
+            >
+              <Eye className="w-3.5 h-3.5" />
+              <div className="absolute inset-0 rounded-md bg-primary/10 animate-pulse group-hover:scale-110 transition-transform" />
+            </button>
             <button 
               onClick={(e) => { e.stopPropagation(); setIsListening(!isListening); }}
               className={cn(
@@ -128,6 +161,7 @@ export default function DesktopOverlay() {
             <button className="p-1.5 hover:bg-white/10 rounded-md transition-colors"><X className="w-3.5 h-3.5 text-zinc-500" /></button>
           </div>
         </motion.div>
+
 
         {/* Telemetry HUD */}
         <div className="grid grid-cols-2 gap-2 mt-4">

@@ -35,6 +35,15 @@ export default function CreateAgentPage() {
       return;
     }
 
+    // MONETIZATION: Paywall for premium features
+    const premiumArchetypes = ["The Sales Closer (Pro)", "The Hacker (Pro)"];
+    if (premiumArchetypes.includes(archetype)) {
+      if (confirm("The " + archetype.replace(" (Pro)", "") + " archetype requires a Pro Plan. Upgrade now?")) {
+        router.push("/pricing");
+      }
+      return;
+    }
+
     setIsDeploying(true);
     try {
       const res = await fetch("/api/agents", {
@@ -153,9 +162,9 @@ export default function CreateAgentPage() {
                     >
                       <option>The Executive</option>
                       <option>The Creator</option>
-                      <option>The Hacker</option>
+                      <option>The Hacker (Pro)</option>
                       <option>The Therapist</option>
-                      <option>The Sales Closer</option>
+                      <option>The Sales Closer (Pro)</option>
                     </select>
                   </div>
                   <div>

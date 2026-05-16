@@ -2,18 +2,18 @@
 
 import { useState } from "react";
 import { 
-  Link2, Search, Github, Slack, ShoppingCart, 
+  Link2, Search, MessageSquare, ShoppingCart, 
   Monitor, CreditCard, Cloud, Database, 
   ExternalLink, ShieldCheck, Zap, Plus,
-  CheckCircle2, AlertCircle, X, Terminal
+  CheckCircle2, AlertCircle, X, Terminal, Globe
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const connectorCategories = ["All", "Developer", "Productivity", "Commerce", "System", "Cloud"];
 
 const availableConnectors = [
-  { id: "github", name: "GitHub", description: "Link repositories, automate PRs, and manage issues.", icon: Github, category: "Developer", status: "connected", account: "AgentOS-Lab" },
-  { id: "slack", name: "Slack", description: "Connect to workspaces for channel-wide agent participation.", icon: Slack, category: "Productivity", status: "connected", account: "Nexus-Tech-HQ" },
+  { id: "github", name: "GitHub", description: "Link repositories, automate PRs, and manage issues.", icon: Globe, category: "Developer", status: "connected", account: "AgentOS-Lab" },
+  { id: "slack", name: "Slack", description: "Connect to workspaces for channel-wide agent participation.", icon: MessageSquare, category: "Productivity", status: "connected", account: "Nexus-Tech-HQ" },
   { id: "shopify", name: "Shopify", description: "Inventory management, order tracking, and store analytics.", icon: ShoppingCart, category: "Commerce", status: "disconnected" },
   { id: "desktop", name: "Local Machine", description: "Direct file system access and local terminal execution.", icon: Monitor, category: "System", status: "disconnected" },
   { id: "stripe", name: "Stripe", description: "Process payments, manage subscriptions, and tax automation.", icon: CreditCard, category: "Commerce", status: "error", error: "API Key Expired" },
