@@ -142,7 +142,7 @@ export const HologramCompanion = ({ isActive }: { isActive: boolean }) => {
                alt="Hologram Agent" 
                width={60} 
                height={60} 
-               className="drop-shadow-[0_0_15px_rgba(0,212,255,0.8)] opacity-90"
+               className="drop-shadow-[0_0_15px_rgba(0,212,255,0.8)] opacity-90 mix-blend-screen"
              />
           </div>
           

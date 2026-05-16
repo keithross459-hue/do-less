@@ -1,13 +1,16 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Bot, Activity, Zap, Shield, Cpu, MessageSquare, ChevronRight, X, Maximize2, Terminal, Eye } from "lucide-react";
+import { Bot, Activity, Zap, Shield, Cpu, MessageSquare, ChevronRight, X, Maximize2, Terminal, Eye, Mic } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { HologramCompanion } from "@/components/HologramCompanion";
+import { VoiceController } from "@/lib/desktop-automation";
 
 export default function DesktopOverlay() {
   const [isHologramActive, setIsHologramActive] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [lastVoiceCmd, setLastVoiceCmd] = useState("");
   const [activeAgents, setActiveAgents] = useState([
     { id: "nexus", name: "Nexus-7", status: "thinking", task: "Analyzing Slack context..." },
     { id: "ceo", name: "CEO Clone", status: "idle", task: "Monitoring market trends" }
@@ -23,8 +26,22 @@ export default function DesktopOverlay() {
   // Handle Holographic Transformation
   const toggleHologram = useCallback(() => {
     setIsHologramActive(true);
-    setTimeout(() => setIsHologramActive(false), 3000); // Effect lasts 3 seconds
+    setTimeout(() => setIsHologramActive(false), 3000); 
   }, []);
+
+  // Voice Control Integration
+  useEffect(() => {
+    const vc = new VoiceController();
+    
+    if (isListening) {
+      vc.startListening((text) => {
+        setLastVoiceCmd(text);
+        toggleHologram(); // Trigger hologram on voice
+      });
+    }
+
+    return () => vc.stopListening();
+  }, [isListening, toggleHologram]);
 
   useEffect(() => {
     const handleGlobalClick = () => toggleHologram();
@@ -92,10 +109,21 @@ export default function DesktopOverlay() {
                <h2 className="text-sm font-display font-bold text-white tracking-wider uppercase">Nexus Core</h2>
                <div className="px-1.5 py-0.5 rounded bg-primary/20 border border-primary/40 text-[8px] text-primary font-bold">MONITORING</div>
             </div>
-            <p className="text-[10px] text-primary font-bold animate-pulse">Controller Connected // Tracking User Intent</p>
+            <p className="text-[10px] text-primary font-bold animate-pulse">
+              {isListening ? (lastVoiceCmd || "Listening...") : "Controller Connected // Tracking User Intent"}
+            </p>
           </div>
 
           <div className="flex gap-1">
+            <button 
+              onClick={(e) => { e.stopPropagation(); setIsListening(!isListening); }}
+              className={cn(
+                "p-1.5 rounded-md transition-all",
+                isListening ? "bg-primary/20 text-primary" : "hover:bg-white/10 text-zinc-500"
+              )}
+            >
+              <Mic className="w-3.5 h-3.5" />
+            </button>
             <button className="p-1.5 hover:bg-white/10 rounded-md transition-colors"><Maximize2 className="w-3.5 h-3.5 text-zinc-500" /></button>
             <button className="p-1.5 hover:bg-white/10 rounded-md transition-colors"><X className="w-3.5 h-3.5 text-zinc-500" /></button>
           </div>
